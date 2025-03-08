@@ -1,0 +1,33 @@
+server:
+  port: 8081
+spring:
+  redis:
+    host: cache
+    port: 6379
+  cloud:
+    function:
+      definition: redisCacheBinding;
+    stream:
+      default-binder: kafka
+      bindings:
+        writeCache-out-0:
+          destination: writeCache
+          userNativeEncoding: true
+          binder: kafka
+        redisCacheBinding-in-0:
+          destination: writeCache
+          group: consumer-group-redis
+          userNativeEncoding: true
+          binder: kafka
+      binders:
+        kafka:
+          type: kafka
+          environment:
+            spring:
+              kafka:
+                bootstrap-servers: kafka:9092
+                consumer:
+                  group-id: ${spring.application.name}
+                  auto-offset-reset: earliest
+  application:
+    name: hotel-services
